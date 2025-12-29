@@ -1,0 +1,641 @@
+\documentclass[a4paper,12pt,reqno]{amsart}%with pdfLatex
+\usepackage[utf8]{inputenc}
+\usepackage[top=25truemm,bottom=25truemm,left=20truemm,right=20truemm]{geometry}
+\usepackage{preamble}
+\input{symbols.tex}
+%\pagestyle{empty}
+%============================================================
+%       title
+%============================================================
+\title{Shapely monads and analytic functors}
+\author{Richard Garner}
+\author{Tom Hirschowitz}
+%\address{Research Institute for Mathematical Sciences, Kyoto University, Kyoto 606-8502, Japan}
+%\email{ykawase@kurims.kyoto-u.ac.jp}
+\date{\mycolor{\today}}
+%\keywords{}
+\thanks{%
+	\mycolor{thanks}%
+}
+%\subjclass{}
+
+\begin{document}
+\begin{abstract}
+	\textcolor{mycolor}{Retyped by ChatGPT-5 and Keisuke Hoshino.}
+	In this paper, we give previcise mathematical form to the idea of a structure whose data and axioms are faithfully represented by a graphical calculus;
+	some prominent examples are operads, polycategories, properads, and PROPs.
+	Building on the established presentation of such structures as algebras for monads on presheaf categories, we describe a characteristic property of the associated monads---
+	the \emph{shapeliness} of the title---which says that ``any two operations of the same shape agree''.
+
+	An important part of this work is the study of analytic functors between presheaf categories, which are a common generalisation of Joyal's analytic endofunctors
+	on sets and of the parametric right adjoint functors on presheaf categories introduced by Diers and studied by Carboni--Johnstone, Leinster and Weber.
+	Our shapely monads will be found among the analytic endofunctors, and may be characterised as the submonads of a ``universal'' analytic monad with ``exactly one operation of each shape''.
+
+	In fact, shapeliness also gives a way to \emph{define} the data and axioms of a structure directly from its graphical calculus, by generating a free shapely monad on the basic operations of the calculus. In this papaer we do this for some of the examples listed above; in future work, we intend to use this to obtain canonical notions of denotational model for graphical calculi such as Milner's bigraphs, Lafont's itneraction nets, or Girard's multiplicative proof nets.
+\end{abstract}
+\maketitle
+
+\color{mycolor}
+\tableofcontents
+\color{black}
+\section{Introduction}
+In mathematics and computer science, we often encounter structures which are faithfully encoded by a graphical calculus of the following sort.
+The basic data of the structure are depicted as certain diagrams; the basic operations of the structure act by glueing together these diagrams along certain parts of their boundaries; and the axioms of the structure are just those necessary to ensure that ``every two ways of glueing a compound diagram together agree''.
+
+Commonly, such calculi depict structures wherein ``functions'', ``arrows'' or ``processes'' are wired together along input or output ``ports''.
+For instance, we have \emph{multicategories} \cite{24},
+whose arrows have many inputs but only one output; \emph{polycategories} \cite{34}, whose arrows have multiple inputs and outputs,
+with composition subject to a linear wiring discipline; and \emph{coloured properads} \cite{36} and \textsc{prop}s \cite{28}, which are like polycategories but allow for non-linear wirings.
+
+Mathematical structures such as these are important in algebraic topology and homological algebra---encoding, for example, operations arising on infinite loop spaces
+\cite{30} or on Hochschild cochains \cite{31}---but also in logic and computer science.
+For example, polycategories encode the underlying semantics of a linear sequent calculus \cite{25}, while \textsc{prop}s have recently been used as an algebraic foundation
+for notions of computational network such as signal flow graphs \cite{3} and Bayesian networks \cite{10}.
+Other kinds of graphical structures arising in computer science include \emph{proof nets} \cite[§2]{12}, interaction nets \cite{23}, and bigraphs \cite{15}.
+
+There is an established approach to describing structures of the above kind using monads on presheaf categories.
+The presheaf category captures the essential topology of the underlying graphical calculus, while the monad encodes both the wiring operations of the structure and the axioms that they obey;
+the algebras for the monad are instances of the structure.
+One aspect which this approach does not account for is that the axioms should be determined by the requirement that ``every two ways of wiring a compound diagram together agree''.
+The first main contribution of this paper is to rectify this: we explain the observed form of the axioms as a property of the associated monad---
+which we term shapeliness---stating that ``every two operations of the same shape coincide''. 
+
+In fact, shapeliness gives not just a way to \emph{characterise} the monads encoding graphical structures, but also systematic way of \emph{generating} them.
+\TODO
+\section{Motivating examples}
+\subsection{Some examples of graphical calculi}
+Before developing our general theory of shapeliness, we describe some of the examples of monads derived from graphical calculi that our theory is intended to capture.
+The graphical calculi which we consider will involve diagrams built out of labelled boxes
+\begin{equation}\tag{2.1}
+	\label{2.1}
+	\makebox[0pt][c]{%
+		\begin{tikzpicture}[x=1cm,y=1cm,font=\large]
+
+		% box (縦長にしてサンプル画像寄せ)
+		\node[box, minimum width=20mm] (f) at (0,0) {$f$};
+
+		% ラベルは1つ
+		\node (Alab) at (0, 2.7) {$A_1\ \cdots\ A_n$};
+		\node (Blab) at (0,-2.7) {$B_1\ \cdots\ B_m$};
+
+		% 配線用の“ダミーアンカー”を2つ（見えない）
+		\coordinate (A1) at ($(Alab.south)+(-0.90,0)$);
+		\coordinate (A2) at ($(Alab.south)+( 0.90,0)$);
+		\coordinate (B1) at ($(Blab.north)+(-0.90,0)$);
+		\coordinate (B2) at ($(Blab.north)+( 0.90,0)$);
+
+		% f のポート（上/下で2本）
+		\coordinate (fN1) at ($(f.north west)!0.30!(f.north east)$);
+		\coordinate (fN2) at ($(f.north west)!0.70!(f.north east)$);
+		\coordinate (fS1) at ($(f.south west)!0.30!(f.south east)$);
+		\coordinate (fS2) at ($(f.south west)!0.70!(f.south east)$);
+
+		% 配線：A から2本、B へ2本（ちゃんと“別の出発点”になる）
+		\draw[wire] (A1) to[out=-90,in=90,looseness=1.10] (fN1);
+		\draw[wire] (A2) to[out=-90,in=90,looseness=1.10] (fN2);
+
+		\draw[wire] (fS1) to[out=-90,in=90,looseness=1.10] (B1);
+		\draw[wire] (fS2) to[out=-90,in=90,looseness=1.10] (B2);
+
+		\end{tikzpicture}
+	}
+\end{equation}
+with a finite number of ``input'' wires (positioned above the box) and ``output'' wires (positioned below).
+There are various interpretations we could give to such a box, for example:
+\begin{enumerate}
+	\item %
+		As a derivation in a linear sequent calculus of $A_1,\ldots,A_n\vdash B_1,\ldots,B_m$;
+	\item %
+		As a linear map $A_1\otimes\cdots\otimes A_n\to B_1\otimes\cdots\otimes B_m$ in a symmetric monoidal closed category;
+	\item %
+		As a program in the typed $\lambda$-calculus of type $A_1\times\cdots\times A_n\to B_1\times\cdots\times B_m$.
+\end{enumerate}
+Each of these interpretations will be associated to a different graphical calculus;
+the difference between them is in the rules governing how boxes can be plugged together to form larger diagrams.
+For example:
+\begin{enumerate}
+	\item %
+		Given proofs $f$ of $C,D\vdash E,F,Z,I,J$ and $g$ of $A,B,Z\vdash G,H$ in the linear sequent calculus, we can cut along the proposition $Z$ to obtain a proof of
+		$A,B,C,D\vdash E,F,G,H,I,J$.
+		Thus, in the corresponding graphical calculus, we can plug together the boxes representing $f$ and $g$ to obtain a diagram:
+		\[
+			\begin{tikzpicture}[x=1cm,y=1cm,font=\large]
+
+			% ---------- layout knobs ----------
+			\def\yTop{4.25}
+			\def\yBot{-1.95}
+
+			% boxes: g は f の「少し左下」程度に留める
+			\node[box, minimum width=20mm] (f) at (4.15,2.45) {$f$};
+			\node[box, minimum width=20mm] (g) at (3.60,0.10) {$g$};
+
+			% ---------- labels ----------
+			\node (A) at (0.70,\yTop) {$A$};
+			\node (B) at (2.40,\yTop) {$B$};
+			\node (C) at (3.55,\yTop) {$C$};
+			\node (D) at (5.05,\yTop) {$D$};
+
+			\node (E) at (0.70,\yBot) {$E$};
+			\node (F) at (2.05,\yBot) {$F$};
+			\node (G) at (3.15,\yBot) {$G$};
+			\node (H) at (4.15,\yBot) {$H$};
+			\node (I) at (5.55,\yBot) {$I$};
+			\node (J) at (6.95,\yBot) {$\ J\ .$};
+
+			% ---------- ports (fractions along edges; stable when you resize boxes) ----------
+			% f: inputs (top)
+			\coordinate (fN1) at ($(f.north west)!0.30!(f.north east)$); % from C
+			\coordinate (fN2) at ($(f.north west)!0.82!(f.north east)$); % from D
+
+			% f: outputs (bottom)
+			\coordinate (fS1) at ($(f.south west)!0.12!(f.south east)$); % to E
+			\coordinate (fS2) at ($(f.south west)!0.30!(f.south east)$); % to F
+			\coordinate (fS3) at ($(f.south west)!0.52!(f.south east)$); % to g (Z)
+			\coordinate (fS4) at ($(f.south west)!0.72!(f.south east)$); % to I
+			\coordinate (fS5) at ($(f.south west)!0.90!(f.south east)$); % to J
+
+			% g: inputs (top)
+			\coordinate (gN1) at ($(g.north west)!0.25!(g.north east)$); % from B
+			\coordinate (gN2) at ($(g.north west)!0.48!(g.north east)$); % from A
+			\coordinate (gN3) at ($(g.north west)!0.78!(g.north east)$); % from Z
+
+			% g: outputs (bottom)
+			\coordinate (gS1) at ($(g.south west)!0.52!(g.south east)$); % to G
+			\coordinate (gS2) at ($(g.south west)!0.78!(g.south east)$); % to H
+
+			% ---------- wires ----------
+			% C,D -> f
+			\draw[wire] (C.south) to[out=-90,in=120,looseness=1.05] (fN1);
+			\draw[wire] (D.south) -- (fN2);
+
+			% f -> E,F (left big arcs; keep curvature consistent)
+			\draw[wire] (fS1) to[out=-165,in=90,looseness=1.15] (E.north);
+			\draw[wire] (fS2) to[out=-155,in=90,looseness=1.05] (F.north);
+
+			% A,B -> g（in と looseness を揃えて、交差点を綺麗に）
+			\draw[wire] (A.south) to[out=-90,in=160,looseness=1.10] (gN1);
+			\draw[wire] (B.south) to[out=-90,in=145,looseness=1.10] (gN2);
+
+			% f -> g（Z：sloped + above で“刺さり”を解消）
+			\draw[wire]
+				(fS3) to[out=-90,in=90,looseness=0]
+				node[pos=0.55, right=0.2pt, yshift=2pt, fill=white, inner sep=0pt] {$Z$}
+				(gN3);
+
+			% g -> G,H (NO control points; just clean out/in curves)
+			\draw[wire] (gS1) to[out=-90,in=90,looseness=1.05] (G.north);
+			\draw[wire] (gS2) to[out=-90,in=90,looseness=1.05] (H.north);
+
+			% f -> I,J (right arcs)
+			\draw[wire] (fS4) to[out=-80,in=95,looseness=1.00] (I.north);
+			\draw[wire] (fS5) to[out=-65,in=95,looseness=1.05] (J.north);
+
+			\end{tikzpicture}
+		\]
+	\item %
+		Given $k$-linear maps $f\colon A\otimes C,g\colon E\to F\otimes G$ and $h\colon C\otimes F\otimes G\to K$,
+		we can consider the $k$-linear map $A\otimes E\otimes B\to K$ which sends $a\otimes e\otimes b$ to $h(f(a\otimes b)\otimes g(e))$.
+		Thus, in the corresponding graphical calculus, we can plug together the boxes representing $f,g$ and $h$ to obtain a diagram:
+		\[
+			\begin{tikzpicture}[x=1cm,y=1cm,font=\large]
+
+			% ---- boxes ----
+			\node[box, minimum width=22mm] (f) at (0.0, 0.0) {$f$};
+			\node[box, minimum width=22mm] (g) at (3.0, 0.0) {$g$};
+			\node[box, minimum width=50mm] (h) at (1.5,-2.0) {$h$};
+
+			% ---- labels ----
+			\node (A) at (-0.32, 2.1) {$A$};
+			\node (E) at (1.6, 2.1) {$E$};
+			\node (B) at (3.5, 2.1) {$B$};
+
+			\node (K) at (1.5,-3.6) {$\ K\,.$};
+
+			% ---- ports ----
+			% f top: A and B
+			\coordinate (fN_A) at ($(f.north west)!0.35!(f.north east)$);
+			\coordinate (fN_B) at ($(f.north west)!0.78!(f.north east)$);
+
+			% g top: E
+			\coordinate (gN_E) at ($(g.north west)!0.30!(g.north east)$);
+
+			% f bottom -> h top (C)
+			\coordinate (fS_C) at ($(f.south west)!0.55!(f.south east)$);
+
+			% g bottom -> h top (F,G)
+			\coordinate (gS_F) at ($(g.south west)!0.35!(g.south east)$);
+			\coordinate (gS_G) at ($(g.south west)!0.80!(g.south east)$);
+
+			% h top ports
+			\coordinate (hN_C) at ($(h.north west)!0.22!(h.north east)$);
+			\coordinate (hN_F) at ($(h.north west)!0.50!(h.north east)$);
+			\coordinate (hN_G) at ($(h.north west)!0.93!(h.north east)$);
+
+			% ---- wires (top) ----
+			\draw[wire] (A) -- (fN_A);
+
+			% crossing pair: E -> g, B -> f
+			\draw[wire] (E) to[out=-90,in=90,looseness=1.25] (gN_E);
+			\draw[wire] (B) to[out=-90,in=90,looseness=0.8] (fN_B);
+
+			% ---- wires (down to h) ----
+			\draw[wire]
+				(fS_C) to[out=-90,in=90,looseness=1.10]
+				node[pos=0.40,left] {$C$}
+				(hN_C);
+
+			\draw[wire]
+				(gS_F) to[out=-105,in=90,looseness=1.15]
+				node[pos=0.55,left=3pt] {$F$}
+				(hN_F);
+
+			\draw[wire]
+				(gS_G) -- node[pos=0.55,right] {$G$} (hN_G);
+
+			% ---- output ----
+			\draw[wire] (h.south) -- (K);
+
+			\end{tikzpicture}
+		\]
+	\item %
+		Given programs $f\colon A\to B$ and $g\colon B\times A\to C$, there is a composite program $\lambda a.g(f(a),a)\colon A\to C$; thus,
+		in the corresponding graphical calculus, we can plug together the boxes for $f$ and $g$ to obtain a diagram:
+		\[
+			\begin{tikzpicture}[x=1cm,y=1cm,font=\Large]
+
+			% boxes
+			\node[box, minimum width=10mm] (f) at (0,0) {$f$};
+			\node[box, minimum width=15mm] (g) at (0.4,-2.0) {$g$};
+
+			% labels
+			\node (A) at (0, 2.35) {$A$};
+			\node (C) at (0.22,-3.85) {$\ C\,.$};
+
+			% ports
+			\coordinate (fN) at (f.north);
+			\coordinate (fS) at (f.south);
+			\coordinate (gN_B) at ($(g.north west)!0.24!(g.north east)$);
+			\coordinate (gN_A) at ($(g.north west)!0.90!(g.north east)$);
+			\coordinate (gS) at ($(g.south west)!0.38!(g.south east)$);
+			% --- junction（A のすぐ下あたり、好みで 0.4 など調整） ---
+			\coordinate (Aj) at ($(A)!0.20!(fN)$);
+
+			% wires: A -> f
+			\draw[wire] (A) -- (fN);
+
+			% vertical wire: f -> B -> g -> C
+			\draw[wire]
+				(fS) to[out=-90,in=90,looseness=0]
+				node[pos=0.55, left=0.3pt, yshift=2pt, fill=white, inner sep=0pt] {$B$}
+				(gN_B);
+			\draw[wire] (gS) -- (C);
+
+			% wires: A -> junction (single stem)
+			\draw[wire] (A) -- (Aj);
+
+			% wires: junction -> f and junction -> g (split)
+			\draw[wire] (Aj) to[out=-80,in=55,looseness=1.2] (gN_A);
+
+			\end{tikzpicture}
+		\]
+\end{enumerate}
+With a little further thought, we can derive from the intended interpretations of the boxes a description of the associated wiring discipline:
+\begin{enumerate}
+	\item %
+		In the linear sequent calculus, we can only cut along a single formula, so that in the corresponding graphical calculus, we can only plug two boxes together
+		along a single wire (output to input);
+	\item %
+		\label{item:2:discipline}
+		In the case of linear maps between vector spaces, we can compose maps together over multiple tensor components, so that we can now plug multiple outputs of one box into multiple inputs of a second. We can also form the tensor product of two maps, corresponding to composing two boxes by placing them alongside each other.
+	\item %
+		In the case of programs, we have the possibility of duplicating or discarding values; thus the corresponding graphical calculus will augment the rules from \eqref{item:2:discipline} by allowing wires to split and terminate as they go down the page.
+\end{enumerate}
+There are other possibilities; for example, intermediate between (i) and (ii) we have (ii)' which allows for plugging multiple inputs as in (ii) but does not allow for placing boxes alongside each other.
+\mycolor{How can we interpret this?}
+\subsection{Algebraic structures from graphical calculi}
+In general, the purpose of graphical calculi is to provide a denotation system for elements in a semantic structure.
+For example, the graphical calculus in (ii) can be used to describe compound morphisms in the category of $k$-vector spaces, but more generally,
+in any symmetric monoidal category \cite{20}; it is essentially the calculus of string diagrams in \cite{18}.
+However, the calculus in (iii), with its more permissive wiring discipline, cannot be interpreted into $k$-vector spaces as there is no $k$-linear correlate to the operation of splitting or terminating wires.
+
+There is a particularly canonical class of semantic structures into which a given graphical calculus can be interpreted;
+the structures in this class are built out of families of sets representing the wires and boxes of the graphical calculus, together with operations on those sets encoding
+the wires and boxes of the graphical calculus, together with operations on those sets encoding the wiring discipline.
+For the graphical calculus in (i) above, these structures are the \emph{polycategories} of \cite{33}.
+These were explicitly introduced as semantic models for a two-sided propositional sequent calculus;
+although originally this was the classical Genzten calculus, it later became clear \cite{25} that they encode precisely the sequent calculus of multiplicative linear logic.
+\begin{definition}[2.1]
+	\label{def:2.1}
+	A small (symmetric) polycategory $\cl C$ comprises a set $\ob(\cl C)$ of \emph{objects};
+	sets $\cl C(\b A;\b B)$ of \emph{morphisms} for each pair of lists $\b A=(A_1,\ldots,A_n)$ and $\b B=(B_1,\ldots,B_m)$ of objects;
+	and the following further data:
+	\begin{itemize}
+		\item %
+			\emph{Identity} morphisms $\id_A\in\cl C(A;A)$ for each object.
+		\item %
+			\emph{Composition} operations giving for each $f\in\cl C(\b A;\b B)$ and $g\in\cl C(\b C;\b D)$ and indices $i,j$ with $B_i=C_j$, a morphism
+			\[
+				g\pcirc ji f\in\cl C(\b C_{<j},\b A,\b C_{>j};\b B_{<i},\b D,\b B_{>i})\ ,
+			\]
+			here we use comma to denote concatenation of lists, and write $\b C_{<j}$ for the list $(C_1,\ldots,C_{j-1})$ and so on.
+		\item %
+			\emph{Exchange} operations giving for each $f\in\cl C(\b A;\b B)$ and permutations $\varphi\in\mathfrak S_n$ (the symmetric group on $n$ letters)
+			and $\psi\in\mathfrak S_m$ an element
+			\[
+				\psi\cdot f\cdot \varphi\in\cl C(\b A_\varphi;\b B_{\psi^{-1}})
+			\]
+			where $\b A_\varphi$ denotes the list $(A_{\varphi(1)},\ldots,A_{\varphi(n)})$ and likewise for $\b B_{\psi^{-1}}$.
+	\end{itemize}
+	These data are required to satisfy the axioms of \cref{def:2.2} below.
+\end{definition}
+If $\cl C$ is a polycategory, then we think of elements of $\ob(\cl C)$ as wire-labels,
+and elements of $\cl C(\b A;\b B)$ as boxes of the form \eqref{2.1}.
+The operations of a polycategory now correspond to the elementary wiring operations on such boxes.
+The identity morphisms can be depicted as bare wires; composition $g\pcirc ji f$ as the plugging of the $i$th output of $f$ into the $j$th input of $g$,
+as on the left below;
+and exchange as the rearrangement of input or output wires, as on the right below.
+\begin{equation}\tag{2.2}
+	%========================
+	% left diagram
+	%========================
+	\begin{tikzpicture}[x=1cm,y=1cm,font=\Large]
+
+	% labels (top / bottom)
+	\node (CtL) at (-3.2, 3.2) {$C_1\cdots C_{j-1}$};
+	\node (At)  at ( 0.0, 3.2) {$A_1\ \cdots\ A_n$};
+	\node (CtR) at ( 3.2, 3.2) {$C_{j+1}\cdots C_p$};
+
+	\node (BbL) at (-3.2,-3.2) {$B_1\cdots B_{i-1}$};
+	\node (Dt)  at ( 0.0,-3.2) {$D_1\ \cdots\ D_q$};
+	\node (BbR) at ( 3.2,-3.2) {$B_{i+1}\cdots B_m$};
+
+	% 配線用の“ダミーアンカー”を2つ（見えない）
+	\coordinate (CtL1) at ($(CtL.south)+(-0.90,0)$);
+	\coordinate (CtL2) at ($(CtL.south)+( 0.90,0)$);
+	\coordinate (At1) at ($(At.south)+(-0.90,0)$);
+	\coordinate (At2) at ($(At.south)+( 0.90,0)$);
+	\coordinate (CtR1) at ($(CtR.south)+(-0.90,0)$);
+	\coordinate (CtR2) at ($(CtR.south)+( 0.90,0)$);
+	\coordinate (BbL1) at ($(BbL.north)+(-0.90,0)$);
+	\coordinate (BbL2) at ($(BbL.north)+( 0.90,0)$);
+	\coordinate (Dt1) at ($(Dt.north)+(-0.90,0)$);
+	\coordinate (Dt2) at ($(Dt.north)+( 0.90,0)$);
+	\coordinate (BbR1) at ($(BbR.north)+(-0.90,0)$);
+	\coordinate (BbR2) at ($(BbR.north)+( 0.90,0)$);
+
+	% boxes
+	\node[box, minimum width=18mm] (f) at (0, 1.3) {$f$};
+	\node[box, minimum width=18mm] (g) at (0,-1.3) {$g$};
+
+	% ports on f
+	\coordinate (fN1) at ($(f.north west)!0.35!(f.north east)$);
+	\coordinate (fN2) at ($(f.north west)!0.65!(f.north east)$);
+
+	\coordinate (fS1) at ($(f.south west)!0.18!(f.south east)$); % left bundle 1
+	\coordinate (fS2) at ($(f.south west)!0.32!(f.south east)$); % left bundle 2
+	\coordinate (fS3) at ($(f.south west)!0.50!(f.south east)$); % middle vertical
+	\coordinate (fS4) at ($(f.south west)!0.68!(f.south east)$); % right bundle 1
+	\coordinate (fS5) at ($(f.south west)!0.82!(f.south east)$); % right bundle 2
+
+	% ports on g
+	\coordinate (gN1) at ($(g.north west)!0.18!(g.north east)$);
+	\coordinate (gN2) at ($(g.north west)!0.32!(g.north east)$);
+	\coordinate (gN3) at ($(g.north west)!0.50!(g.north east)$);
+	\coordinate (gN4) at ($(g.north west)!0.68!(g.north east)$);
+	\coordinate (gN5) at ($(g.north west)!0.82!(g.north east)$);
+
+	\coordinate (gS1) at ($(g.south west)!0.40!(g.south east)$);
+	\coordinate (gS2) at ($(g.south west)!0.60!(g.south east)$);
+
+	% A -> f (two wires)
+	\draw[wire] (At1) to[out=-90,in=90,looseness=1.15] (fN1);
+	\draw[wire] (At2) to[out=-90,in=90,looseness=1.15] (fN2);
+
+	% f -> g (two bundles + one vertical)
+	\draw[wire] (fS3) -- (gN3);
+
+	% g -> D (two wires)
+	\draw[wire] (gS1) to[out=-90,in=90,looseness=1.15] (Dt1);
+	\draw[wire] (gS2) to[out=-90,in=90,looseness=1.15] (Dt2);
+
+	% outer crossing wires (4本：画像のXっぽい外側)
+	\draw[wire] (CtL1) to[out=-90,in=90,looseness=0.5] (gN1);
+	\draw[wire] (CtL2) to[out=-90,in=90,looseness=0.5] (gN2);
+
+	\draw[wire] (CtR1) to[out=-90,in=90,looseness=0.5] (gN4);
+	\draw[wire] (CtR2) to[out=-90,in=90,looseness=0.5] (gN5);
+
+	\draw[wire] (BbL1) to[out=90,in=-90,looseness=0.5] (fS1);
+	\draw[wire] (BbL2) to[out=90,in=-90,looseness=0.5] (fS2);
+	\draw[wire] (BbR1) to[out=90,in=-90,looseness=0.5] (fS4);
+	\draw[wire] (BbR2) to[out=90,in=-90,looseness=0.5] (fS5);
+
+	\end{tikzpicture}
+	\qquad\qquad
+	%========================
+	% right diagram
+	%========================
+	\begin{tikzpicture}[x=1cm,y=1cm,font=\Large]
+
+	% box
+	\node[box, minimum width=40mm] (f) at (0,0) {$f$};
+
+	% top labels
+	\node (A2) at (-1.3, 3.0) {$A_2$};
+	\node (A3) at ( 0.0, 3.0) {$A_3$};
+	\node (A1) at ( 1.3, 3.0) {$A_1$};
+
+	% bottom labels
+	\node (B4) at (-1.8,-3.0) {$B_4$};
+	\node (B1) at (-0.6,-3.0) {$B_1$};
+	\node (B3) at ( 0.6,-3.0) {$B_3$};
+	\node (B2) at ( 1.8,-3.0) {$B_2$};
+
+	% ports (3 inputs, 4 outputs)
+	\coordinate (fN1) at ($(f.north west)!0.20!(f.north east)$);
+	\coordinate (fN2) at ($(f.north west)!0.50!(f.north east)$);
+	\coordinate (fN3) at ($(f.north west)!0.80!(f.north east)$);
+
+	\coordinate (fS1) at ($(f.south west)!0.15!(f.south east)$);
+	\coordinate (fS2) at ($(f.south west)!0.40!(f.south east)$);
+	\coordinate (fS3) at ($(f.south west)!0.60!(f.south east)$);
+	\coordinate (fS4) at ($(f.south west)!0.85!(f.south east)$);
+
+	% inputs: A2, A3 cross; A1 straight-ish
+	\draw[wire] (A2) to[out=-90,in=90,looseness=1.20] (fN2);
+	\draw[wire] (A3) to[out=-90,in=90,looseness=1.35] (fN3);
+	\draw[wire] (A1) to[out=-90,in=90,looseness=1.15] (fN1);
+
+	% outputs: outer to B4/B2, inner crossing to B1/B3
+	\draw[wire] (fS1) to[out=-90,in=90,looseness=1] (B1);
+	\draw[wire] (fS2) to[out=-90,in=90,looseness=1] (B2);
+
+	\draw[wire] (fS3) to[out=-90,in=90,looseness=0.5] (B3);
+	\draw[wire] (fS4) to[out=-90,in=90,looseness=0.5] (B4);
+
+	\end{tikzpicture}
+\end{equation}
+[Note that the identities of a polycategory involve only a single object rather than a list.
+A geometric explanation for this is that all the graphs occurring in polycategorical composition are \emph{connected}, whereas the identity on a list of objects would be an unconnected graph. \mycolor{Is this explanation valid for non-symmetric polycategories? Can we generalise this perspective to more general polycategories/D-categories?}]
+
+In terms of the graphical calculus, the axioms for a polycategory can be seen simply as asserting that various ways of wiring together a diagram of boxes coincide.
+We now give these axioms in full, mainly to show how unpalatable they are when presented algebraically, and without any real expectation that the reader should work through the details.
+\begin{definition}
+	The axioms for a polycategory $\cl C$ are:
+	\begin{itemize}
+		\item %
+			The \emph{unit} axioms:
+			\[
+				f\pcirc i1 \id_{A_i}=f=\id_{B_j}\pcirc 1j f
+			\]
+			for all $f\in\cl C(\b A;\b B)$ and valid indices $i,j$.
+		\item %
+			The \emph{associativity} axiom:
+			\begin{equation}
+				\tag{2.3}
+				(h\pcirc \ell k g)\pcirc {\bar\jmath}i f
+				=
+				h\pcirc h{\bar k}(g\pcirc ji f)
+			\end{equation}
+			for all $f\in\cl C(\b A;\b B),g\in\cl C(\b C;\b D)$ and $h\in\cl C(\b E;\b F)$ and all indices $i,j,k,\ell$ with $B_i=C_j$ and $D_k=E_\ell$.
+			Here $\bar\jmath=j+\ell-1$ and $\bar k=k+i-1$.
+		\item %
+		\item %
+		\item %
+		\item %
+	\end{itemize}
+\end{definition}
+\TODO
+\section{Familial functors and shapeliness}
+Now that we have described various ``graphical specified'' structures as algebras for monads on presheaf categories,
+we begin our attempts to obtain these monads via a notion of shapeliness.
+As in the introduction, our approach will be to seek on the appropriate presheaf category a \emph{universal} shapely monad $\sf U$ with
+``exactly one operation of each shape'', and to generate the monad encoding the given structure as a suitable submonad of $\sf U$.
+In this section, we look for $\sf U$ as a terminal object among \emph{familially representable}, or more shortly \emph{familial}, endofunctors---
+ones which pointwise are coproducts of representables.
+While this turns out not quite to work, the techniques we develop will be crucial to our subsequent efforts.
+\subsection{Linear operations and familial functors}
+The key concept underlying the notion of familial functor is that of a \emph{linear operation}.
+\begin{definition}
+	Given a functor $F\colon\cl A\arr\cl B$ and objects $A\in\cl A$ and $B\in\cl B$,
+	an \emph{$F$-operation of input arity $A$ at stage $B$} is a map $t\colon B\to FA$.
+	An $F$-operation $t\colon B\to FA$ is \emph{linear} if it is initial in its connected component of the comma category $B\downarrow F$.
+\end{definition}
+\begin{cproposition}
+	Let $\cl A$ be a category and $A\in\cl A$ an object.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			$A$ is an initial object in $\cl A$.
+		\item %
+			$A$ is Galois and $\mathfrak S_A$ is trivial.
+	\end{enumerate}
+	Here, the group $\mathfrak S_A$ is the automorphism group of $A$.
+\end{cproposition}
+\begin{cproposition}
+	\label{prop:linear-object}
+	Let $\cl A$ be a category and $A\in\cl A$ an object.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			$A$ is initial in its connected component of $\cl A$.
+		\item %
+			$A$ is strongly projective to all morphisms in $\cl A$;
+			i.e., for each morphism $f\colon X\to Y$ in $\cl A$, the function
+			\[
+				\cl A(A,f)\colon \cl A(A,X)\arr \cl A(A,Y)
+			\]
+			is a bijection.
+		\qedhere
+	\end{enumerate}
+\end{cproposition}
+\begin{cproof}
+	\TODO
+\end{cproof}
+\begin{cdefinition}
+	Let $\cl A$ be a category.
+	An object $A\in\cl A$ is \emph{linear} if it satisfies the equivalent conditions of \Cref{prop:linear-object}.
+\end{cdefinition}
+An operation $t\colon B\to TA$ of a monad $\sf T$ on $\cl A$ corresponds to a family of interpretation functions $\llbracket t \rrbracket\colon\cl A(A,X)\arr\cl A(B,X)$,
+one for each $\sf T$-algebra $(X,x)$;
+maps of $B\downarrow T$ account for reindexing such $\sf T$-operations so as to act only on part of their input arity, so that linearity
+expresses the idea of an operation which ``consumes all its input arity''.
+\begin{cdefinition}
+	Let $\sf T$ be a monad on a category $\cl A$. We write $T$ for the underlying endofunctor of $\sf T$.
+	There is a fully faithful functor $\overline{\llbracket-\rrbracket}\colon\cl A_{\sf T}\arr {[\cl A^{\sf T},\Set]^\op}$
+	defined as the composite
+	\[
+		\begin{tikzcd}
+			{\cl A_{\sf T}}
+			\ar[r,hook]
+			&
+			{\cl A^{\sf T}}
+			\ar[r,hook]
+			&
+			{{[\cl A^{\sf T},\Set]^\op}}
+		\end{tikzcd}
+	\]
+	where the first functor is the free inclusion and the second is the contravariant Yoneda embedding.
+
+	For each $B\in\cl A$, we write $\llbracket -\rrbracket^B_{\sf T}\colon (B\downarrow T)^\op\arr {[\cl A^{\sf T},\Set]/{\cl A(B,U^{\sf T}-)}}$
+	for the fully faithful functor obtained by slicing over $B$ the functor $\overline{\llbracket-\rrbracket}^\op$.
+	We often omit the stage $B$ and the monad $\sf T$ when they are clear from context.
+\end{cdefinition}
+\begin{lemma}
+	\mycolor{Let $F\colon\cl A\arr\cl B$ be a functor.}
+	An operation $t\colon B\to FA$ is linear if and only if for every square of the following form,
+	there is a unique $h\colon A\to A'$ with $Fh.t=u$; it then follows also that $fh=g$.
+	\[
+		\begin{tikzcd}
+			B
+			\ar[r,"u"]
+			\ar[d,"t"']
+				&
+				FA'
+				\ar[d,"Ff"]
+			\\
+			FA
+			\ar[r,"Fg"']
+			\ar[ru,dashed,"Fh"description]
+				&
+				FA''
+		\end{tikzcd}
+	\]
+\end{lemma}
+\begin{proof}
+	This is \cite[Proposition~0]{6}.
+\end{proof}
+Now a \emph{familial} functor is one whose operations are all reindexings of linear ones.
+In giving the definition, we say that $Y$ \emph{covers} $X$ if there is a map $Y\to X$.
+\begin{cdefinition}
+	Let $\cl A$ be a category and $X,Y\in\cl A$ objects.
+	We say that $Y$ \emph{covers} $X$ if there is
+	a morphism $Y\to X$ in $\cl A$.
+\end{cdefinition}
+\begin{cproposition}
+	Let $\cl A$ be a category.
+	Any object $X$ is covered by at most one linear object in the following sense:
+	for linear objects $Y,Y'\in\cl A$, if there are morphisms $f\colon Y\to X$ and $f'\colon Y'\to X$, then there is an isomorphism $h\colon Y\to Y'$ with $f'h=f$.
+\end{cproposition}
+\begin{cproof}
+	\TODO
+\end{cproof}
+\begin{definition}
+	A functor $F\colon\cl A\arr\cl B$ is \emph{familial at stage $B\in\cl B$} if each operation in $B\downarrow F$ is covered by a linear one;
+	an natural transformation $\alpha\colon F\arr G$ is 
+	\emph{familial at stage $B$} if $F$ and $G$ are so,
+	and the induced functor $B\downarrow F\to B\downarrow G$
+\end{definition}
+\TODO
+\section{Analytic functors and shapeliness}
+\TODO
+\section{Cellular functors and shapeliness}
+\TODO
+\section{Shapeliness in context}
+\TODO
+
+
+\nocite{*}
+\printbibliography
+
+\end{document}

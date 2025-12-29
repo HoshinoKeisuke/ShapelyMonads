@@ -1,0 +1,17 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'main.blg'
+[33] biber-darwin:342> INFO - === Mon Dec 29, 2025, 17:39:12
+[40] Biber.pm:421> INFO - Reading 'main.bcf'
+[88] Biber.pm:999> INFO - Using all citekeys in bib section 0
+[96] Biber.pm:4487> INFO - Processing section 0
+[101] Biber.pm:4678> INFO - Looking for bibtex file './references.bib' for section 0
+[102] bibtex.pm:1713> INFO - LaTeX decoding ...
+[134] bibtex.pm:1519> INFO - Found BibTeX data source './references.bib'
+[256] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[256] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[256] Biber.pm:4307> INFO - Sorting list 'nyt/global//global/global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[256] Biber.pm:4313> INFO - No sort tailoring available for locale 'en-US'
+[276] bbl.pm:676> INFO - Writing 'main.bbl' with encoding 'UTF-8'
+[285] bbl.pm:779> INFO - Output to main.bbl
+[285] Biber.pm:132> WARN - legacy year field '1961/62' in entry '7' is not an integer - this will probably not sort properly.
+[285] Biber.pm:134> INFO - WARNINGS: 1

@@ -1,0 +1,653 @@
+\ProvidesPackage{preamble}
+%===== packages ====
+\RequirePackage[T1]{
+fontenc,% bold small caps
+}
+\RequirePackage[bbgreekl]{%
+mathbbol,%白抜きの数字
+}
+\RequirePackage{%
+amsmath,%
+amsthm,%
+amsfonts,%
+amssymb,%\boxtimes
+stmaryrd,%\llbracket
+mathtools,%
+mathcommand,% define mathmode versions of \b, \bb, \h, etc...
+%mathrsfs,%mathscr
+tikz,%
+thmtools, %定理名
+ascmac,%screen環境
+enumitem,%enumerate環境のlabel,ref
+subfiles,% \subfile{}
+here,% {figure}[H] メモ用
+mathcommand,% define mathmode versions of \b, \bb, \h, etc...
+xspace,% \xspace
+bm,% bold math
+diagbox,% diagonal box in table
+booktabs,% specialrule in table
+xcolor,% colorlet
+chngcntr, % \counterwithin
+scalerel, %
+stackengine, %
+etoolbox, % \patchcmd
+upgreek, % upright greek letters
+textcase, % \MakeTextUppercase
+}
+%===== miscellaneous ====
+%\usepackage{textcase}
+\let\MakeUppercase\MakeTextUppercase
+% 右端に小さめ斜体でタグを出す (need enumitem)
+\newcommand{\itemtag}[1]{{\hfill\normalfont (#1)}}
+
+\newcommand{\tq}[1]{{*}_{#1}}
+
+\stackMath
+\newcommand\reallywidehat[1]{%
+\savestack{\tmpbox}{\stretchto{%
+  \scaleto{%
+    \scalerel*[\widthof{\ensuremath{#1}}]{\kern-.6pt\bigwedge\kern-.6pt}%
+    {\rule[-\textheight/2]{1ex}{\textheight}}%WIDTH-LIMITED BIG WEDGE
+  }{\textheight}% 
+}{0.5ex}}%
+\stackon[1pt]{#1}{\tmpbox}%
+}
+\parskip 1ex
+\makeatletter
+% #1=マスター env 名（theoremT）, #2=CSVで兄弟 env 群
+\newcommand{\SyncThmDisplay}[2]{%
+  \forcsvlist{\SyncThmDisplayAux{#1}}{#2}}
+\newcommand{\SyncThmDisplayAux}[2]{%
+  \expandafter\renewcommand\csname the#2\endcsname{\csname the#1\endcsname}}
+\makeatother
+\setcounter{MaxMatrixCols}{20} % 20 列に拡張
+% opposite for colon
+\newcommand*\lon{%
+        \nobreak
+        \mskip6mu plus1mu
+        \mathpunct{}%
+        \nonscript
+        \mkern-\thinmuskip
+        {:}%
+        \mskip2mu
+        \relax
+}
+
+% 要: amsmath, xparse
+% \begin{mybmatrix}[<exp>][<bmatrix options>]
+%   ... 本体 ...
+% \end{mybmatrix}
+% どちらのオプションも「与えられたときだけ」出力するように 'o' で定義
+\NewDocumentEnvironment{mybmatrix}{ o o +b }{%
+  \begingroup
+  \begin{bmatrix}%
+    \IfNoValueF{#2}{[#2]}% 2番目(=bmatrixオプション)があればだけ [..] を出す
+  #3%
+  \end{bmatrix}%
+  \IfNoValueF{#1}{^{(\mkern1mu #1\mkern1mu)}}% 1番目(=指数)があればだけ ^{[...]} を付ける
+  \endgroup
+}{}
+
+
+% TODO
+\colorlet{todocolor}{orange}
+\newcommand*{\TODO}[1][TODO]{\textcolor{todocolor}{\textup{#1}}\xspace}
+\newcommand*{\inred}[1]{{\color{red} #1}}
+
+\DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+\DeclareSymbolFontAlphabet{\mathbbl}{bbold}
+
+\makeatletter
+\newcommand{\labeleditem}[1]{
+\item[\text{#1}]\protected@edef\@currentlabel{\text{#1}}\phantomsection
+}
+\makeatother
+%https://tex.stackexchange.com/a/328393
+%https://tex.stackexchange.com/questions/81949/can-individual-items-in-an-itemize-list-be-labelled-and-hyperref-linked
+
+%==== hyperref/cleveref ====
+\definecolor{darkblue}{cmyk}{1,0.7,0,0.6}
+\definecolor{darkgreen}{rgb}{0.2,0.5,0.2}
+\definecolor{almostblackviolet}{cmyk}{0.70,1.00,0,0.5}
+\RequirePackage[%
+		colorlinks=true,%
+		linkcolor=almostblackviolet,%
+		citecolor=green,%
+		urlcolor=darkgreen,%
+		%dvipdfmx,%
+]{hyperref}
+\RequirePackage[%
+%		nameinlink,%
+]{cleveref}
+\crefname{equation}{}{}
+\setlist[enumerate,1]{label=(\roman*), ref=\roman*}
+\crefname{section}{Section}{Sections}
+%\crefname{chapter}{Chapter}{Chapters}
+\setcounter{secnumdepth}{2}
+% 章・節・小節の番号書式を明示
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+
+
+
+%===== proof environment redefinition ====
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{%
+  \par\pushQED{\qed}% □ の準備
+  \normalfont            % 本文は直立
+  \topsep\medskipamount  % 前後の空き（好みで調整）
+  \trivlist
+  % インデントをほぼ消して，見出しだけイタリック＋ピリオド
+  \item[\hskip\labelsep\itshape #1\@addpunct{.}]\ignorespaces
+}{%
+  \popQED\endtrivlist\@endpefalse
+}
+\makeatother
+\NewDocumentEnvironment{cproof}{ O{\proofname} +b }{%
+  \begingroup
+  \color{mycolor}%
+  \begin{proof}[#1]%
+	#2
+}{%
+  \end{proof}%
+  \endgroup
+}
+%===== theorem styles ====
+\declaretheoremstyle[
+		spaceabove=0pt,%
+		spacebelow=-10pt,%
+		headfont={\normalfont\ttfamily},%
+		notefont={\normalfont},%
+		bodyfont={\addtolength{\leftskip}{.8em}},%
+		postheadspace=.5em,%
+		headpunct={.},%
+]{claim}
+\declaretheoremstyle[
+		spaceabove=0pt,%
+		spacebelow=5pt,%
+		headfont={\normalfont},%
+		notefont={\normalfont},%
+		bodyfont={\addtolength{\leftskip}{.8em}},%
+		postheadspace=.5em,%
+		headpunct={},%
+]{since}
+\declaretheoremstyle[
+  spaceabove=\medskipamount,
+  spacebelow=\medskipamount,
+  headfont=\normalfont\bfseries, % definition系と同じ
+  bodyfont=\normalfont,          % definition系と同じ
+  headpunct={},                  % 「.」など打たない場合
+  postheadspace=0.5em,
+  headformat=\NUMBER             % ←ここがポイント：番号だけ出す
+]{definition-number-only}
+
+\newcommand*{\noqed}{\let\qed\relax}% remove qed from the environment
+\declaretheorem[%
+		style=definition,%
+		within=section,%
+		qed=$\lrcorner$,%
+]{originaldefinition}
+\numberwithin{equation}{originaldefinition}
+%\numberwithin{enumi}{originaldefinition}
+\declaretheorem[%
+		style=definition,%
+		sibling=originaldefinition,%
+		qed=$\lrcorner$,%
+]{definition,remark,example,notation,fact,construction}
+\declaretheorem[%
+		style=definition-number-only,%
+		sibling=originaldefinition,%
+		qed=$\lrcorner$,%
+]{gblock}
+\declaretheorem[%
+		style=definition,%
+		sibling=originaldefinition,%
+		qed=$\lrcorner$,%
+		postfoothook={\setcounter{claim}{0}},
+]{theorem,lemma,corollary,proposition}
+\declaretheorem[%
+		style=claim,%
+]{claim}
+\declaretheorem[%
+		style=since,%
+		numbered=no,%
+		qed=$\lozenge$,%
+		name=$\because$,%
+]{since}
+% c-block environments
+\definecolor{mycolor}{rgb}{0.1,0.1,0.5}
+\newcommand*{\mycolor}{\textcolor{mycolor}}
+\declaretheorem[
+	style=definition,%
+	numberwithin=subsection,%
+	name=Definition,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{cdefinition}
+\declaretheorem[
+	style=definition,%
+	sibling=cdefinition,%
+	name=Corollary,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{ccorollary}
+\declaretheorem[
+	style=definition,%
+	sibling=cdefinition,%
+	name=Proposition,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{cproposition}
+\declaretheorem[
+	style=definition,%
+	sibling=cdefinition,%
+	name=Remark,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{cremark}
+\declaretheorem[
+	style=definition,%
+	sibling=cdefinition,%
+	name=Lemma,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{clemma}
+%===========================================
+
+%======= title formatting (etoolbox) ==========
+\makeatletter
+\patchcmd{\subsubsection}{\normalfont}{\normalfont\bfseries}{}{}
+\patchcmd{\subsubsection}{\itshape}{\upshape}{}{}
+\makeatother
+%===========================================
+
+%======= hyperref cleveref H-番号設定 =======
+% --- ユニークなH-番号を与える（hyperref用アンカー名）---
+\makeatletter
+
+% 「今どの階層にいるか」に応じた接頭辞（section と subsection の両方を含める）
+\newcommand{\Hcurrentprefix}{%
+  \thesection
+  \ifnum\value{subsection}>0 .\arabic{subsection}\fi
+}
+
+% originaldefinition を親とする全ての“きょうだい定理環境”に同じ H-番号の形式を与える
+\renewcommand{\theHoriginaldefinition}{\Hcurrentprefix.\arabic{originaldefinition}}
+\renewcommand{\theHdefinition}{\theHoriginaldefinition}
+\renewcommand{\theHremark}{\theHoriginaldefinition}
+\renewcommand{\theHgblock}{\theHoriginaldefinition}
+\renewcommand{\theHexample}{\theHoriginaldefinition}
+\renewcommand{\theHnotation}{\theHoriginaldefinition}
+\renewcommand{\theHfact}{\theHoriginaldefinition}
+\renewcommand{\theHconstruction}{\theHoriginaldefinition}
+\renewcommand{\theHtheorem}{\theHoriginaldefinition}
+\renewcommand{\theHlemma}{\theHoriginaldefinition}
+\renewcommand{\theHcorollary}{\theHoriginaldefinition}
+\renewcommand{\theHproposition}{\theHoriginaldefinition}
+
+% 式番号も originaldefinition に従属しているので、H-番号もそれに追随させる
+\renewcommand{\theHequation}{\theHoriginaldefinition.\arabic{equation}}
+
+\makeatother
+%===========================================
+
+%======= cleveref names設定 ===========
+\newcommand{\creflastconjunction}{ and~}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{definition}{Definition}{Definitions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{remark}{Remark}{Remarks}
+\crefname{gblock}{}{}
+\crefname{example}{Example}{Examples}
+\crefname{notation}{Notation}{Notations}
+\crefname{construction}{Construction}{Construction}
+
+% Permit referencing to items in theorems, etc. This is currently set up to be correct for amsart.
+\crefname{theoremenumi}{Theorem}{Theorems}
+\AtBeginEnvironment{theorem}{%
+	\numberwithin{equation}{theorem}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{theoremenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thetheorem\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{theoremenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\csname thetheorem\endcsname.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{propositionenumi}{Proposition}{Propositions}
+\AtBeginEnvironment{proposition}{%
+	\numberwithin{equation}{proposition}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{propositionenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname theproposition\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{propositionenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\csname theproposition\endcsname.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{factenumi}{Fact}{Facts}
+\AtBeginEnvironment{fact}{%
+	\numberwithin{equation}{fact}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{factenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thefact\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{factenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\csname thefact\endcsname.(\roman{enumi}).(\alph*)}
+	}%
+}
+\crefname{constructionenumi}{Construction}{Constructions}
+\AtBeginEnvironment{construction}{%
+	\numberwithin{equation}{construction}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{constructionenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname theconstruction\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{constructionenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\csname theconstruction\endcsname.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{lemmaenumi}{Lemma}{Lemmas}
+\AtBeginEnvironment{lemma}{%
+	\numberwithin{equation}{lemma}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{lemmaenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thelemma\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{lemmaenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\csname thelemma\endcsname.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{corollaryenumi}{Corollary}{Corollaries}
+\AtBeginEnvironment{corollary}{%
+	\numberwithin{equation}{corollary}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{corollaryenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thecorollary\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{corollaryenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\thecorollary.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{definitionenumi}{Definition}{Definitions}
+\AtBeginEnvironment{definition}{%
+	\numberwithin{equation}{definition}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{definitionenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thedefinition\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{definitionenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\thedefinition.(\roman{enumi}).(\alph*)}
+	}%
+}
+\crefname{remarkenumi}{Remark}{Remarks}
+\AtBeginEnvironment{remark}{%
+	\numberwithin{equation}{remark}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{remarkenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname theremark\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{remarkenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\theremark.(\roman{enumi}).(\alph*)}
+	}%
+}
+\crefname{gblockenumi}{}{}
+\AtBeginEnvironment{gblock}{%
+	\numberwithin{equation}{gblock}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{gblockenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thegblock\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{gblockenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\thegblock.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{notationenumi}{Definition}{Definitions}
+\AtBeginEnvironment{notation}{%
+	\numberwithin{equation}{notation}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{notationenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname thenotation\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{notationenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\thenotation.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+\crefname{exampleenumi}{Example}{Examples}
+\AtBeginEnvironment{example}{%
+	\numberwithin{equation}{example}% ←局所的なのでグループ外に影響しない
+	\setcounter{equation}{0}%        ←リセットは自分で入れる
+	\crefalias{enumi}{exampleenumi}%
+	\setlist[enumerate,1]{
+			label={(\roman*)},%
+			ref={\csname theexample\endcsname.(\roman*)}
+	}%
+	\crefalias{enumii}{exampleenumi}%
+	\setlist[enumerate,2]{
+			label={(\alph*)},%
+			ref={\theexample.(\roman{enumi}).(\alph*)}
+	}%
+}
+
+
+
+%==== biblatex ====
+% reference の形式などを管理
+\RequirePackage[%
+		backend=biber,%
+		style=alphabetic,%
+		sorting=nyt,%
+		giveninits=true,%first nameをinitialで省略
+		backref=true,%
+		isbn=false,%
+		url=true,%
+]{biblatex}
+\addbibresource{./references.bib}
+% remove "p." or "pp." from citations
+\DeclareFieldFormat{postnote}{#1}
+\DeclareFieldFormat{multipostnote}{#1}
+
+
+
+%===== toc ====
+\setcounter{tocdepth}{1}
+
+
+%== Formattings ===
+% Bold
+\renewmathcommand{\b}{\mathbf}
+% Bold sans-serif
+\DeclareMathAlphabet{\mathsfbf}{OT1}{cmss}{bx}{n} % こいつは16番目のフォントなので、これ以上はfontを追加できない。例えばmathscrは無理。
+\newcommand*{\bsf}[1]{\mathsfbf{#1}}
+%\newcommand*{\bsf}[1]{{\bm{\mathsf{#1}}}}
+% Blackboard
+\newmathcommand{\bb}{\mathbbl}
+% Caligraph
+\newmathcommand{\cl}{\mathcal}
+% Fraktur
+\newmathcommand{\fk}{\mathfrak}
+% Blackboard and Bold (for double categories)
+\newcommand{\dc}[1]{\mathbf{\mathbbl #1}}
+% small capital
+\renewcommand{\sc}{\textsc}
+% mathtt
+\renewmathcommand{\tt}{\mathtt}
+% mathsf
+\renewmathcommand{\sf}{\mathsf}
+% mathrm
+\renewmathcommand{\rm}{\mathrm}
+
+%===== tikz ====
+\usetikzlibrary{arrows,arrows.meta,decorations.pathreplacing,shapes,calc,cd,nfold,positioning}
+\usetikzlibrary{decorations.markings,decorations.pathmorphing}
+% path of horizontal arrows
+\tikzset{labelsize/.style={font=\scriptsize}}
+\tikzset{2cell/.style={-implies,double,double equal sign distance}}
+\tikzset{3cell/.style={double equal sign distance, nfold = 3, arrows=-Implies}}
+\tikzset{string/.style={very thick}}
+\tikzset{string/.style={very thick}}
+\tikzset{
+  box/.style={
+    draw,
+    minimum height=11mm,
+    inner sep=1pt,
+  },
+  wire/.style={
+    line width=0.85pt,
+    line cap=round,
+  },
+}
+\tikzset{
+  pto/.style={->,postaction={decorate},
+    decoration={
+        markings,
+        mark=at position 0.5 with {\arrow{|}}}
+  },
+}
+\tikzcdset{
+path/.code = {\tikzcdset{dashed};},
+phan/.code = {\tikzcdset{dotted};},
+Rgh/.code = {\tikzcdset{Rightarrow};},
+squ/.code = {\tikzcdset{rightsquigarrow};},
+%every label/.append style={inner sep=0pt},
+}
+
+% horizontal arrow
+\tikzstyle{vslash} = [decoration={markings, mark=at position 0.5 with {\draw[-,solid] (0,-1.5pt) -- (0,1.5pt);}}, postaction ={decorate}]
+\newcommand{\har}[1][]{\arrow[vslash,#1]}
+\newcommand{\harrow}[1][]{\arrow[vslash,#1]}
+\newcommand{\hpath}[1][]{\arrow[vslash,path,#1]}
+\newcommand{\hphan}[1][]{\arrow[vslash,phan,#1]}
+
+
+% identity
+\tikzcdset{equal/.append style={double distance=1.0pt,-}}
+%\tikzstyle{hequal} = [double distance=1.5pt,-, decoration={markings, mark=at position 0.5 with {\draw[-] (0,-2.0pt) -- (0,2.0pt);}}, postaction ={decorate}]
+
+% changing arrow style
+\tikzcdset{%
+		arrow style=tikz,
+		diagrams={>={Straight Barb[scale=0.8]}}
+}
+
+% pullback symbol
+\NewDocumentCommand{\pullback}{O{} D""{\lrcorner}}{%
+	\arrow[#1,phantom,"{#2}"{description,very near start,inner sep=0}]%
+}
+
+% `spath3` is necessary to draw shortened edges.
+\usetikzlibrary{spath3}
+
+% A TikZ style for curved arrows of a fixed height, due to AndréC.
+\tikzset{curve/.style={settings={#1},to path={(\tikztostart)
+    .. controls ($(\tikztostart)!\pv{pos}!(\tikztotarget)!\pv{height}!270:(\tikztotarget)$)
+    and ($(\tikztostart)!1-\pv{pos}!(\tikztotarget)!\pv{height}!270:(\tikztotarget)$)
+    .. (\tikztotarget)\tikztonodes}},
+    settings/.code={\tikzset{quiver/.cd,#1}
+        \def\pv##1{\pgfkeysvalueof{/tikz/quiver/##1}}},
+    quiver/.cd,pos/.initial=0.35,height/.initial=0}
+
+% A TikZ style for shortening paths without the poor behaviour of `shorten <' and `shorten >'.
+\tikzset{between/.style n args={2}{/tikz/execute at end to={
+    \tikzset{spath/split at keep middle={current}{#1}{#2}}
+}}}
+
+% TikZ arrowhead/tail styles.
+\tikzset{tail reversed/.code={\pgfsetarrowsstart{tikzcd to}}}
+\tikzset{2tail/.code={\pgfsetarrowsstart{Implies[reversed]}}}
+\tikzset{2tail reversed/.code={\pgfsetarrowsstart{Implies}}}
+% TikZ arrow styles.
+\tikzset{no body/.style={/tikz/dash pattern=on 0 off 1mm}}
+
+%================================================================================================
+%   inline arrows
+%================================================================================================
+\NewDocumentCommand{\arr}{D""{} O{} O{1.3}}{\mathrel{
+		\begin{tikzcd}[column sep={#3em}, ampersand replacement=\&, every label/.append style={font=\small}]
+				\hspace{-2ex}\ar[r, "{#1}", #2] \& \hspace{-2ex}
+		\end{tikzcd}
+}}
+\NewDocumentCommand{\rra}{D""{} O{} O{1.3}}{\mathrel{
+		\begin{tikzcd}[column sep={#3em}, ampersand replacement=\&, every label/.append style={font=\small}]
+				\hspace{-2ex} \& \hspace{-2ex}\ar[l, "{#1}"', #2]
+		\end{tikzcd}
+}}
+
+\NewDocumentCommand{\harr}{D""{} O{} O{1.3}}{\mathrel{
+		\begin{tikzcd}[column sep={#3em}, ampersand replacement=\&, every label/.append style={font=\small}]
+				\hspace{-2ex}\ar[r,vslash,"{#1}",#2] \& \hspace{-2ex}
+		\end{tikzcd}
+}}
+
+
+%================================================================================================
+%   diagram
+%================================================================================================
+\NewDocumentCommand{\adjoint}{D""{\perp} O{1.5}}{% \adjoint(⊥)[1(em)]{left object}{right object}
+		\begin{tikzcd}[ampersand replacement=\&, every label/.append style={font=\scriptsize},column sep={#2em}]
+				{\hspace{-1.5ex}}
+				\ar[r, phantom, "{\mbox{\tiny $#1$}}"]
+				\ar[r, shift right={0.35em}]
+				\&
+				{\hspace{-1.5ex}}
+				\ar[l, shift right={0.3em},]
+		\end{tikzcd}
+}
+
+
+\endinput

@@ -23,4 +23,4 @@
 *.vim
 storehouse.tex
 .DS_Store
-
+.latexmkrc

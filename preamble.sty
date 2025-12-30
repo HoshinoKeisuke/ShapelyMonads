@@ -14,7 +14,7 @@ amssymb,%\boxtimes
 stmaryrd,%\llbracket
 mathtools,%
 mathcommand,% define mathmode versions of \b, \bb, \h, etc...
-%mathrsfs,%mathscr
+mathrsfs,%mathscr
 tikz,%
 thmtools, %定理名
 ascmac,%screen環境
@@ -234,6 +234,14 @@ textcase, % \MakeTextUppercase
   preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
   postfoothook=\endgroup
 ]{ccorollary}
+\declaretheorem[
+	style=definition,%
+	sibling=cdefinition,%
+	name=Assumption,%
+	qed=$\lrcorner$,%
+  preheadhook={\begingroup\color{mycolor}}, % 見出しの前でグループ開始＆色指定
+  postfoothook=\endgroup
+]{cassumption}
 \declaretheorem[
 	style=definition,%
 	sibling=cdefinition,%
@@ -512,8 +520,8 @@ textcase, % \MakeTextUppercase
 % Bold
 \renewmathcommand{\b}{\mathbf}
 % Bold sans-serif
-\DeclareMathAlphabet{\mathsfbf}{OT1}{cmss}{bx}{n} % こいつは16番目のフォントなので、これ以上はfontを追加できない。例えばmathscrは無理。
-\newcommand*{\bsf}[1]{\mathsfbf{#1}}
+%\DeclareMathAlphabet{\mathsfbf}{OT1}{cmss}{bx}{n} % こいつは16番目のフォントなので、これ以上はfontを追加できない。例えばmathscrは無理。
+%\newcommand*{\bsf}[1]{\mathsfbf{#1}}
 %\newcommand*{\bsf}[1]{{\bm{\mathsf{#1}}}}
 % Blackboard
 \newmathcommand{\bb}{\mathbbl}
@@ -531,6 +539,8 @@ textcase, % \MakeTextUppercase
 \renewmathcommand{\sf}{\mathsf}
 % mathrm
 \renewmathcommand{\rm}{\mathrm}
+% mathscr
+\newmathcommand{\scr}{\mathscr}
 
 %===== tikz ====
 \usetikzlibrary{arrows,arrows.meta,decorations.pathreplacing,shapes,calc,cd,nfold,positioning}

@@ -326,30 +326,30 @@ These were explicitly introduced as semantic models for a two-sided propositiona
 although originally this was the classical Genzten calculus, it later became clear \cite{25} that they encode precisely the sequent calculus of multiplicative linear logic.
 \begin{definition}[2.1]
 	\label{def:2.1}
-	A small (symmetric) polycategory $\cl C$ comprises a set $\ob(\cl C)$ of \emph{objects};
-	sets $\cl C(\b A;\b B)$ of \emph{morphisms} for each pair of lists $\b A=(A_1,\ldots,A_n)$ and $\b B=(B_1,\ldots,B_m)$ of objects;
+	A small (symmetric) polycategory $\scr C$ comprises a set $\ob(\scr C)$ of \emph{objects};
+	sets $\scr C(\b A;\b B)$ of \emph{morphisms} for each pair of lists $\b A=(A_1,\ldots,A_n)$ and $\b B=(B_1,\ldots,B_m)$ of objects;
 	and the following further data:
 	\begin{itemize}
 		\item %
-			\emph{Identity} morphisms $\id_A\in\cl C(A;A)$ for each object.
+			\emph{Identity} morphisms $\id_A\in\scr C(A;A)$ for each object.
 		\item %
-			\emph{Composition} operations giving for each $f\in\cl C(\b A;\b B)$ and $g\in\cl C(\b C;\b D)$ and indices $i,j$ with $B_i=C_j$, a morphism
+			\emph{Composition} operations giving for each $f\in\scr C(\b A;\b B)$ and $g\in\scr C(\b C;\b D)$ and indices $i,j$ with $B_i=C_j$, a morphism
 			\[
-				g\pcirc ji f\in\cl C(\b C_{<j},\b A,\b C_{>j};\b B_{<i},\b D,\b B_{>i})\ ,
+				g\pcirc ji f\in\scr C(\b C_{<j},\b A,\b C_{>j};\b B_{<i},\b D,\b B_{>i})\ ,
 			\]
 			here we use comma to denote concatenation of lists, and write $\b C_{<j}$ for the list $(C_1,\ldots,C_{j-1})$ and so on.
 		\item %
-			\emph{Exchange} operations giving for each $f\in\cl C(\b A;\b B)$ and permutations $\varphi\in\mathfrak S_n$ (the symmetric group on $n$ letters)
+			\emph{Exchange} operations giving for each $f\in\scr C(\b A;\b B)$ and permutations $\varphi\in\mathfrak S_n$ (the symmetric group on $n$ letters)
 			and $\psi\in\mathfrak S_m$ an element
 			\[
-				\psi\cdot f\cdot \varphi\in\cl C(\b A_\varphi;\b B_{\psi^{-1}})
+				\psi\cdot f\cdot \varphi\in\scr C(\b A_\varphi;\b B_{\psi^{-1}})
 			\]
 			where $\b A_\varphi$ denotes the list $(A_{\varphi(1)},\ldots,A_{\varphi(n)})$ and likewise for $\b B_{\psi^{-1}}$.
 	\end{itemize}
 	These data are required to satisfy the axioms of \cref{def:2.2} below.
 \end{definition}
-If $\cl C$ is a polycategory, then we think of elements of $\ob(\cl C)$ as wire-labels,
-and elements of $\cl C(\b A;\b B)$ as boxes of the form \eqref{2.1}.
+If $\scr C$ is a polycategory, then we think of elements of $\ob(\scr C)$ as wire-labels,
+and elements of $\scr C(\b A;\b B)$ as boxes of the form \eqref{2.1}.
 The operations of a polycategory now correspond to the elementary wiring operations on such boxes.
 The identity morphisms can be depicted as bare wires; composition $g\pcirc ji f$ as the plugging of the $i$th output of $f$ into the $j$th input of $g$,
 as on the left below;
@@ -481,14 +481,14 @@ A geometric explanation for this is that all the graphs occurring in polycategor
 In terms of the graphical calculus, the axioms for a polycategory can be seen simply as asserting that various ways of wiring together a diagram of boxes coincide.
 We now give these axioms in full, mainly to show how unpalatable they are when presented algebraically, and without any real expectation that the reader should work through the details.
 \begin{definition}
-	The axioms for a polycategory $\cl C$ are:
+	The axioms for a polycategory $\scr C$ are:
 	\begin{itemize}
 		\item %
 			The \emph{unit} axioms:
 			\[
 				f\pcirc i1 \id_{A_i}=f=\id_{B_j}\pcirc 1j f
 			\]
-			for all $f\in\cl C(\b A;\b B)$ and valid indices $i,j$.
+			for all $f\in\scr C(\b A;\b B)$ and valid indices $i,j$.
 		\item %
 			The \emph{associativity} axiom:
 			\begin{equation}
@@ -497,7 +497,7 @@ We now give these axioms in full, mainly to show how unpalatable they are when p
 				=
 				h\pcirc h{\bar k}(g\pcirc ji f)
 			\end{equation}
-			for all $f\in\cl C(\b A;\b B),g\in\cl C(\b C;\b D)$ and $h\in\cl C(\b E;\b F)$ and all indices $i,j,k,\ell$ with $B_i=C_j$ and $D_k=E_\ell$.
+			for all $f\in\scr C(\b A;\b B),g\in\scr C(\b C;\b D)$ and $h\in\scr C(\b E;\b F)$ and all indices $i,j,k,\ell$ with $B_i=C_j$ and $D_k=E_\ell$.
 			Here $\bar\jmath=j+\ell-1$ and $\bar k=k+i-1$.
 		\item %
 		\item %
@@ -517,16 +517,16 @@ While this turns out not quite to work, the techniques we develop will be crucia
 \subsection{Linear operations and familial functors}
 The key concept underlying the notion of familial functor is that of a \emph{linear operation}.
 \begin{definition}
-	Given a functor $F\colon\cl A\arr\cl B$ and objects $A\in\cl A$ and $B\in\cl B$,
+	Given a functor $F\colon\scr A\arr\scr B$ and objects $A\in\scr A$ and $B\in\scr B$,
 	an \emph{$F$-operation of input arity $A$ at stage $B$} is a map $t\colon B\to FA$.
 	An $F$-operation $t\colon B\to FA$ is \emph{linear} if it is initial in its connected component of the comma category $B\downarrow F$.
 \end{definition}
 \begin{cproposition}
-	Let $\cl A$ be a category and $A\in\cl A$ an object.
+	Let $\scr A$ be a category and $A\in\scr A$ an object.
 	The following are equivalent.
 	\begin{enumerate}
 		\item %
-			$A$ is an initial object in $\cl A$.
+			$A$ is an initial object in $\scr A$.
 		\item %
 			$A$ is Galois and $\mathfrak S_A$ is trivial.
 	\end{enumerate}
@@ -534,16 +534,16 @@ The key concept underlying the notion of familial functor is that of a \emph{lin
 \end{cproposition}
 \begin{cproposition}
 	\label{prop:linear-object}
-	Let $\cl A$ be a category and $A\in\cl A$ an object.
+	Let $\scr A$ be a category and $A\in\scr A$ an object.
 	The following are equivalent.
 	\begin{enumerate}
 		\item %
-			$A$ is initial in its connected component of $\cl A$.
+			$A$ is initial in its connected component of $\scr A$.
 		\item %
-			$A$ is strongly projective to all morphisms in $\cl A$;
-			i.e., for each morphism $f\colon X\to Y$ in $\cl A$, the function
+			$A$ is strongly projective to all morphisms in $\scr A$;
+			i.e., for each morphism $f\colon X\to Y$ in $\scr A$, the function
 			\[
-				\cl A(A,f)\colon \cl A(A,X)\arr \cl A(A,Y)
+				\scr A(A,f)\colon \scr A(A,X)\arr \scr A(A,Y)
 			\]
 			is a bijection.
 		\qedhere
@@ -553,36 +553,36 @@ The key concept underlying the notion of familial functor is that of a \emph{lin
 	\TODO
 \end{cproof}
 \begin{cdefinition}
-	Let $\cl A$ be a category.
-	An object $A\in\cl A$ is \emph{linear} if it satisfies the equivalent conditions of \Cref{prop:linear-object}.
+	Let $\scr A$ be a category.
+	An object $A\in\scr A$ is \emph{linear} if it satisfies the equivalent conditions of \Cref{prop:linear-object}.
 \end{cdefinition}
-An operation $t\colon B\to TA$ of a monad $\sf T$ on $\cl A$ corresponds to a family of interpretation functions $\llbracket t \rrbracket\colon\cl A(A,X)\arr\cl A(B,X)$,
+An operation $t\colon B\to TA$ of a monad $\sf T$ on $\scr A$ corresponds to a family of interpretation functions $\llbracket t \rrbracket\colon\scr A(A,X)\arr\scr A(B,X)$,
 one for each $\sf T$-algebra $(X,x)$;
 maps of $B\downarrow T$ account for reindexing such $\sf T$-operations so as to act only on part of their input arity, so that linearity
 expresses the idea of an operation which ``consumes all its input arity''.
 \begin{cdefinition}
-	Let $\sf T$ be a monad on a category $\cl A$. We write $T$ for the underlying endofunctor of $\sf T$.
-	There is a fully faithful functor $\overline{\llbracket-\rrbracket}\colon\cl A_{\sf T}\arr {[\cl A^{\sf T},\Set]^\op}$
+	Let $\sf T$ be a monad on a category $\scr A$. We write $T$ for the underlying endofunctor of $\sf T$.
+	There is a fully faithful functor $\overline{\llbracket-\rrbracket}\colon\scr A_{\sf T}\arr[hook] {[\scr A^{\sf T},\Set]}^\op$
 	defined as the composite
 	\[
 		\begin{tikzcd}
-			{\cl A_{\sf T}}
+			{\scr A_{\sf T}}
 			\ar[r,hook]
 			&
-			{\cl A^{\sf T}}
+			{\scr A^{\sf T}}
 			\ar[r,hook]
 			&
-			{{[\cl A^{\sf T},\Set]^\op}}
+			{{[\scr A^{\sf T},\Set]}^\op}
 		\end{tikzcd}
 	\]
 	where the first functor is the free inclusion and the second is the contravariant Yoneda embedding.
 
-	For each $B\in\cl A$, we write $\llbracket -\rrbracket^B_{\sf T}\colon (B\downarrow T)^\op\arr {[\cl A^{\sf T},\Set]/{\cl A(B,U^{\sf T}-)}}$
+	For each $B\in\scr A$, we write $\llbracket -\rrbracket^B_{\sf T}\colon (B\downarrow T)^\op\arr[hook] {[\scr A^{\sf T},\Set]}/{\scr A(B,U^{\sf T}-)}$
 	for the fully faithful functor obtained by slicing over $B$ the functor $\overline{\llbracket-\rrbracket}^\op$.
 	We often omit the stage $B$ and the monad $\sf T$ when they are clear from context.
 \end{cdefinition}
 \begin{lemma}
-	\mycolor{Let $F\colon\cl A\arr\cl B$ be a functor.}
+	\mycolor{Let $F\colon\scr A\arr\scr B$ be a functor.}
 	An operation $t\colon B\to FA$ is linear if and only if for every square of the following form,
 	there is a unique $h\colon A\to A'$ with $Fh.t=u$; it then follows also that $fh=g$.
 	\[
@@ -608,24 +608,136 @@ expresses the idea of an operation which ``consumes all its input arity''.
 Now a \emph{familial} functor is one whose operations are all reindexings of linear ones.
 In giving the definition, we say that $Y$ \emph{covers} $X$ if there is a map $Y\to X$.
 \begin{cdefinition}
-	Let $\cl A$ be a category and $X,Y\in\cl A$ objects.
+	Let $\scr A$ be a category and $X,Y\in\scr A$ objects.
 	We say that $Y$ \emph{covers} $X$ if there is
-	a morphism $Y\to X$ in $\cl A$.
+	a morphism $Y\to X$ in $\scr A$.
 \end{cdefinition}
-\begin{cproposition}
-	Let $\cl A$ be a category.
+\begin{clemma}
+	Let $\scr A$ be a category.
 	Any object $X$ is covered by at most one linear object in the following sense:
-	for linear objects $Y,Y'\in\cl A$, if there are morphisms $f\colon Y\to X$ and $f'\colon Y'\to X$, then there is an isomorphism $h\colon Y\to Y'$ with $f'h=f$.
+	for linear objects $Y,Y'\in\scr A$, if there are morphisms $f\colon Y\to X$ and $f'\colon Y'\to X$, then there is an isomorphism $h\colon Y\to Y'$ with $f'h=f$.
+\end{clemma}
+\begin{clemma}
+	Let $\scr A$ be a category.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			Any object is covererd by a linear object.
+		\item %
+			$\scr A$ is equivalent to a coproduct of categories with initial objects.
+		\qedhere %
+	\end{enumerate}
+\end{clemma}
+\begin{definition}
+	A functor $F\colon\scr A\arr\scr B$ is \emph{familial at stage $B\in\scr B$} if each operation in $B\downarrow F$ is covered by a linear one;
+	an natural transformation $\alpha\colon F\arr G$ is 
+	\emph{familial at stage $B$} if $F$ and $G$ are so,
+	and the induced functor $B\downarrow F\to B\downarrow G$
+	preserves linear operations.
+	We write simply \emph{familial} to mean ``familial at every stage''.
+\end{definition}
+Familial functors were introduced by Diers \cite{6}; his terminology is that familial functors are those ``having a left multiadjoint''.
+Our name is a shortening of the term ``familially representable'' used---for special case $\scr B=\Set$---in \cite{16}.
+\begin{clemma}
+	Let $\scr A$ be a category and $F\colon\scr A\arr\Set$ be a copresheaf.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			$F$ is representable.
+		\item %
+			The category of elements $\int F$ has an initial object.
+		\qedhere %
+	\end{enumerate}
+\end{clemma}
+\begin{lemma}
+	A functor $F\colon\scr A\arr\scr B$ is familial at stage $B\in\scr B$ if and only if
+	the functor $\scr B(B,F-)\colon\scr A\arr\Set$ is a (possibly large) coproduct of representables.
+\end{lemma}
+\begin{proof}
+	\TODO
+\end{proof}
+\begin{cassumption}
+	Assume that large coproducts and large limits in $\b{SET}$ distribute in the sense that
+	the large coproduct functor $\coprod\colon\b{FAM}\arr\b{SET}$ from the large coproduct cocompletion preserves large limits.
+	(This is an assumption on the foundation of large sets; our large universe has strong \emph{extensivity} properties.)
+
+	This is equivalent to saying that in the double category $\dc{PROF}$,
+	the class of weights $\Phi_{\rm{pro}}$ of possibly large coproducts of representables (i.e.\ companions)
+	is closed under extension.
+\end{cassumption}
+\begin{cproposition}
+	Let $F\colon\scr A\arr\scr B$ be a functor and $U\colon\cl I\arr\scr B$ be a diagram in $\scr B$ with colimit $\colim U$.
+	If $F$ is familial at each stage $U_i$ for $i\in\cl I$, then $F$ is familial at stage $\colim U$.
 \end{cproposition}
 \begin{cproof}
 	\TODO
 \end{cproof}
+\begin{cdefinition}
+	Let $F\colon\scr A\arr\scr B$ be a functor.
+	Let $B\colon\scr X\arr\scr B$ be a functor.
+	We say that $F$ is \emph{familial at stage $B$} if the $\b{SET}$-profunctor
+	$\scr B(B,F)\colon\scr X\harr\scr A$ is a (possibly large) coproduct of companions.
+\end{cdefinition}
+\begin{clemma}
+	Let $F\colon\scr A\arr\scr B$ be a functor and
+	$B\colon\scr X\arr[hook]\scr B$ a fully faithful functor.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			$F$ is familial at stage $B$.
+		\item %
+			For each $X\in\scr X$,
+			the functor $F$ is familial at stage $B X$.
+		\qedhere %
+	\end{enumerate}
+\end{clemma}
+\begin{cdefinition}
+	Let $\Phi$ be a saturated class of weights.
+	Let $F\colon\scr A\arr\scr B$ and
+	and $B\colon\scr X\arr\scr B$ be functors.
+	We say that $F$ is \emph{$\Phi$-familial at stage $B$} if the $\b{SET}$-profunctor
+	$\scr B(B,F)\colon\scr X\harr\scr A$ is in $\Phi$.
+\end{cdefinition}
+\subsection{Pointwise familiality}
+\begin{cdefinition}
+	Let $\scr A$ and $\scr B$ be categories and $F\colon\scr A\arr\scr B$ be a functor.
+	Let $B\in\scr B$ be an object.
+	We say that $F$ is \emph{small familial at stage $B$} if it is familial at stage $B$ and
+	the category $B\downarrow F$ has a mere set of connected components.
+\end{cdefinition}
+\begin{clemma}
+	Let $\scr A$ and $\scr B$ be categories and $F\colon\scr A\arr\scr B$ be a functor.
+	Let $B\in\scr B$ be an object.
+	The following are equivalent.
+	\begin{enumerate}
+		\item %
+			$F$ is small familial at stage $B$.
+		\item %
+			The copresheaf $\scr B(B,F-)\colon\scr A\arr\Set$ is a small coproduct of representables.
+		\qedhere %
+	\end{enumerate}
+\end{clemma}
+\mycolor{%
+	For each category $\scr C$, the presheaf category is denoted $\scr P\scr C={[\scr C^\op,\Set]}$.
+	When $\scr C$ is locally small, the Yoneda embedding is written $\sf y\colon \scr C\arr\scr P\scr C$.%
+}
+We will be interested in familial endofunctors of presheaf categories; later, we will need more general familial functors with
+\emph{codomain} a presheaf category. The most relevant kind of familiality for these is:
 \begin{definition}
-	A functor $F\colon\cl A\arr\cl B$ is \emph{familial at stage $B\in\cl B$} if each operation in $B\downarrow F$ is covered by a linear one;
-	an natural transformation $\alpha\colon F\arr G$ is 
-	\emph{familial at stage $B$} if $F$ and $G$ are so,
-	and the induced functor $B\downarrow F\to B\downarrow G$
+	\mycolor{Let $\scr C$ be a locally small category.}
+	A functor $F\colon\scr A\arr\scr P\scr C$ or transformation $\alpha\colon F\arr G$
+	is \emph{pointwise familial} if it is familial at all representable stages $\sf y_c\in\scr P\scr C$;
+	while $F$ is called \emph{small} if $\sf y_c\downarrow F$ has a mere \emph{set} of connected components for each $c\in\scr C$.
+	We write $\b{FAM}_\pt(\scr A,\scr P\scr C)$ for the category of small pointwise familial functors and pointwise familial transformations.
 \end{definition}
+\begin{cdefinition}
+	For a category $\scr A$, an \emph{arity} of $\scr A$ is a dense full subcategorry $\scr A_a\arr[hook]\scr A$ of $\scr A$.
+\end{cdefinition}
+\begin{cdefinition}
+	Let $\scr B$ be a category with an arity $\scr B_a\arr[hook]\scr B$.
+	Let $\scr A$ be a category and $F\colon\scr A\arr\scr B$ be a functor.
+	We say that $F$ is \emph{pointwise familial at arity $\scr B_a$} if it is familial at each stage $B$ in $\scr B_a$.
+\end{cdefinition}
 \TODO
 \section{Analytic functors and shapeliness}
 \TODO

@@ -582,6 +582,7 @@ expresses the idea of an operation which ``consumes all its input arity''.
 	We often omit the stage $B$ and the monad $\sf T$ when they are clear from context.
 \end{cdefinition}
 \begin{lemma}
+	\label{lem:3.2}
 	\mycolor{Let $F\colon\scr A\arr\scr B$ be a functor.}
 	An operation $t\colon B\to FA$ is linear if and only if for every square of the following form,
 	there is a unique $h\colon A\to A'$ with $Fh.t=u$; it then follows also that $fh=g$.
@@ -650,6 +651,7 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 	\end{enumerate}
 \end{clemma}
 \begin{lemma}
+	\label{lem:3.4}
 	A functor $F\colon\scr A\arr\scr B$ is familial at stage $B\in\scr B$ if and only if
 	the functor $\scr B(B,F-)\colon\scr A\arr\Set$ is a (possibly large) coproduct of representables.
 \end{lemma}
@@ -660,14 +662,46 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 	Assume that large coproducts and large limits in $\b{SET}$ distribute in the sense that
 	the large coproduct functor $\coprod\colon\b{FAM}\arr\b{SET}$ from the large coproduct cocompletion preserves large limits.
 	(This is an assumption on the foundation of large sets; our large universe has strong \emph{extensivity} properties.)
-
-	This is equivalent to saying that in the double category $\dc{PROF}$,
-	the class of weights $\Phi_{\rm{pro}}$ of possibly large coproducts of representables (i.e.\ companions)
-	is closed under extension.
 \end{cassumption}
+\begin{cdefinition}
+	We write $\Phi_{\rm{Lpro}}$ for the class of $\b{SET}$-profunctors
+	that are presented by spans of the form
+	\[
+		\begin{tikzcd}
+			\scr X
+			&
+			\scr X'
+			\ar[l,"d"']
+			\ar[r,"u"]
+			&
+			\scr A
+		\end{tikzcd}
+	\]
+	with $d$ a discrete fibration.
+\end{cdefinition}
+\begin{clemma}
+	$\Phi_{\rm{Lpro}}$ is closed under the following operations in the double category $\dc{PROF}$:
+	\begin{itemize}
+		\item %
+			Restriction on left by arbitrary functors.
+			\TODO[More explanation]
+		\item %
+			Composition on left by arbitrary $\b{SET}$-profunctors.
+		\item %
+			Extension along arbitrary $\b{SET}$-profunctors.
+		\qedhere %
+	\end{itemize}
+\end{clemma}
+\begin{cproposition}
+	$\Phi_{\rm{Lpro}}$ coincides with the class of weights for possibly large products.
+\end{cproposition}
+\begin{proof}
+	\TODO
+\end{proof}
 \begin{cproposition}
 	Let $F\colon\scr A\arr\scr B$ be a functor and $U\colon\cl I\arr\scr B$ be a diagram in $\scr B$ with colimit $\colim U$.
 	If $F$ is familial at each stage $U_i$ for $i\in\cl I$, then $F$ is familial at stage $\colim U$.
+	Moreover, if $\cl I$ is small and $F$ is small familial at each $U_i$, then $F$ is also small familial at stage $\colim U$.
 \end{cproposition}
 \begin{cproof}
 	\TODO
@@ -675,22 +709,8 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 \begin{cdefinition}
 	Let $F\colon\scr A\arr\scr B$ be a functor.
 	Let $B\colon\scr X\arr\scr B$ be a functor.
-	We say that $F$ is \emph{familial at stage $B$} if the $\b{SET}$-profunctor
-	$\scr B(B,F)\colon\scr X\harr\scr A$ is a (possibly large) coproduct of companions.
+	We say that $F$ is \emph{familial at stage $B$} if $F$ is familial at stage $BX$ for each $X\in\scr X$.
 \end{cdefinition}
-\begin{clemma}
-	Let $F\colon\scr A\arr\scr B$ be a functor and
-	$B\colon\scr X\arr[hook]\scr B$ a fully faithful functor.
-	The following are equivalent.
-	\begin{enumerate}
-		\item %
-			$F$ is familial at stage $B$.
-		\item %
-			For each $X\in\scr X$,
-			the functor $F$ is familial at stage $B X$.
-		\qedhere %
-	\end{enumerate}
-\end{clemma}
 \begin{cdefinition}
 	Let $\Phi$ be a saturated class of weights.
 	Let $F\colon\scr A\arr\scr B$ and
@@ -731,13 +751,48 @@ We will be interested in familial endofunctors of presheaf categories; later, we
 	We write $\b{FAM}_\pt(\scr A,\scr P\scr C)$ for the category of small pointwise familial functors and pointwise familial transformations.
 \end{definition}
 \begin{cdefinition}
-	For a category $\scr A$, an \emph{arity} of $\scr A$ is a dense full subcategorry $\scr A_a\arr[hook]\scr A$ of $\scr A$.
+	For a category $\scr A$, an \emph{arity} of $\scr A$ is a (largely) dense full subcategorry $\scr A_a\arr[hook]\scr A$ of $\scr A$.
 \end{cdefinition}
 \begin{cdefinition}
 	Let $\scr B$ be a category with an arity $\scr B_a\arr[hook]\scr B$.
 	Let $\scr A$ be a category and $F\colon\scr A\arr\scr B$ be a functor.
-	We say that $F$ is \emph{pointwise familial at arity $\scr B_a$} if it is familial at each stage $B$ in $\scr B_a$.
+	We say that $F$ is \emph{pointwise familial (at arity $\scr B_a$)} if it is familial at each stage $B$ in $\scr B_a$.
 \end{cdefinition}
+\begin{cproposition}
+	Let $\scr B$ be a category with an arity $\scr B_a\arr[hook]\scr B$.
+	Let $\scr A$ be a category and $F\colon\scr A\arr\scr B$ be a functor.
+	If the density of $\scr B_a\arr[hook]\scr B$ is small, then $F$ is small pointwise familial if and only if it is familial.
+\end{cproposition}
+\begin{proof}
+	\TODO
+\end{proof}
+By \Cref{lem:3.4}, $F\colon\scr A\arr\scr P\scr C$ is (small) pointwise familial just when each functor $(F-)c\in{[\scr A,\Set]}$ can be expressed as
+\begin{equation}
+	\label{3.2}
+	\tag{3.2}
+	(F-)c
+	\cong
+	\sum_{t\in S_c} \scr A(Et,-)
+\end{equation}
+for some set $S_c$ and family of objects $(Et\in\scr A)_{t\in S_c}$.
+So, for example, the ``free polycategory'' endofunctor on the category $\scr P\sf P$ of polygraphs as in \Cref{prop:2.9}
+is pointwise familial, but the corresponding endofunctor on the category $\scr P\sf P_s$ of symmetric polygraphs is \emph{not} so,
+as it involves not just coproducts of representables but also quotients by group actions.
+We will be able to handle the latter example when we consider \emph{analytic} functors in the following section.
+
+We now explain how \eqref{3.2} allows us to give a compact representaton for pointwise familial functors.
+Such a functor $F$ is determined to within isomorphism by the sets $S_c$ and objects $(Et\in\scr A)_{t\in S_c}$ as in $\eqref{3.2}$,
+as $c$ ranges over $\ob(\scr C)$,
+together with information about how these transform under each $(F-)f\colon (F-)d\to (F-)c$.
+More precisely, $(F-)f$ may be identified with a transformation
+\begin{equation}
+	\label{3.3}
+	\tag{3.3}
+	\sum_{t\in S_c} \scr A(Et,-)
+	\arr
+	\sum_{s\in S_d} \scr A(E\mycolor{s},-)
+\end{equation}
+and, by the Yoneda
 \TODO
 \section{Analytic functors and shapeliness}
 \TODO

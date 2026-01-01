@@ -678,15 +678,17 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 		\end{tikzcd}
 	\]
 	with $d$ a discrete fibration.
+
+	We write $\Phi_{\rm{pro}}$ for the subclass of $\Phi_{\rm{Lpro}}$ consisting of those profunctors presented by spans as above
+	where $d$ is fibrewise small.
 \end{cdefinition}
 \begin{clemma}
-	$\Phi_{\rm{Lpro}}$ is closed under the following operations in the double category $\dc{PROF}$:
+	$\Phi_{\rm{Lpro}}$ and $\Phi_{\rm{pro}}$ are closed under the following operations in the double category $\dc{PROF}$:
 	\begin{itemize}
 		\item %
-			Restriction on left by arbitrary functors.
-			\TODO[More explanation]
+			All companions of functors are in $\Phi_{\rm{Lpro}}$ and $\Phi_{\rm{pro}}$.
 		\item %
-			Composition on left by arbitrary $\b{SET}$-profunctors.
+			Composition.
 		\item %
 			Extension along arbitrary $\b{SET}$-profunctors.
 		\qedhere %
@@ -694,10 +696,11 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 \end{clemma}
 \begin{cproposition}
 	$\Phi_{\rm{Lpro}}$ coincides with the class of weights for possibly large products.
+	Moreover, $\Phi_{\rm{pro}}$ coincides with the class of weights for small products.
 \end{cproposition}
-\begin{proof}
+\begin{cproof}
 	\TODO
-\end{proof}
+\end{cproof}
 \begin{cproposition}
 	Let $F\colon\scr A\arr\scr B$ be a functor and $U\colon\cl I\arr\scr B$ be a diagram in $\scr B$ with colimit $\colim U$.
 	If $F$ is familial at each stage $U_i$ for $i\in\cl I$, then $F$ is familial at stage $\colim U$.
@@ -718,6 +721,13 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 	We say that $F$ is \emph{$\Phi$-familial at stage $B$} if the $\b{SET}$-profunctor
 	$\scr B(B,F)\colon\scr X\harr\scr A$ is in $\Phi$.
 \end{cdefinition}
+\begin{cproposition}
+	A functor $F\colon\scr A\arr\scr B$ is familial at stage $B\colon\scr X\arr\scr B$
+	if and only if it is $\Phi_{\rm{Lpro}}$-familial at stage $B$.
+\end{cproposition}
+\begin{cproof}
+	\TODO
+\end{cproof}
 \subsection{Pointwise familiality}
 \begin{cdefinition}
 	Let $\scr A$ and $\scr B$ be categories and $F\colon\scr A\arr\scr B$ be a functor.
@@ -737,6 +747,10 @@ Our name is a shortening of the term ``familially representable'' used---for spe
 		\qedhere %
 	\end{enumerate}
 \end{clemma}
+\begin{cproposition}
+	A functor $F\colon\scr A\arr\scr B$ is small familial at stage $B\colon\scr X\arr\scr B$
+	if and only if it is $\Phi_{\rm{pro}}$-familial at stage $B$.
+\end{cproposition}
 \mycolor{%
 	For each category $\scr C$, the presheaf category is denoted $\scr P\scr C={[\scr C^\op,\Set]}$.
 	When $\scr C$ is locally small, the Yoneda embedding is written $\sf y\colon \scr C\arr\scr P\scr C$.%
